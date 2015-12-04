@@ -314,9 +314,9 @@ public abstract class TokenIntegrationTest {
             // Check against the info in the system tables, which is a bit weak since it's exactly how the metadata is
             // constructed in the first place, but there's not much else we can do.
             // Note that this relies on all queries going to node 1, which is why we use a WhiteList LBP in setup().
-            Row row = (host.listenAddress == null)
+            Row row = (host.getBroadcastAddress() == null)
                 ? session.execute("select tokens from system.local").one()
-                : session.execute("select tokens from system.peers where peer = '" + host.listenAddress.getHostAddress() + "'").one();
+                : session.execute("select tokens from system.peers where peer = '" + host.getBroadcastAddress().getHostAddress() + "'").one();
             Set<String> tokenStrings = row.getSet("tokens", String.class);
             assertThat(tokenStrings).hasSize(numTokens);
             Iterable<Token> tokensFromSystemTable = Iterables.transform(tokenStrings, new Function<String, Token>() {
