@@ -1,5 +1,10 @@
 ## Changelog
 
+### 3.0.0-rc1 (in progress)
+
+- [improvement] JAVA-1013: TimestampCodec should format dates in human-readable format.
+
+
 ### 3.0.0-beta1
 
 - [bug] JAVA-993: Support for "custom" types after CASSANDRA-10365.

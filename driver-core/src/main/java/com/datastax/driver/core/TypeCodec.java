@@ -35,9 +35,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.datastax.driver.core.exceptions.InvalidTypeException;
 import com.datastax.driver.core.utils.Bytes;
 
-import static com.datastax.driver.core.TypeTokens.listOf;
-import static com.datastax.driver.core.TypeTokens.mapOf;
-import static com.datastax.driver.core.TypeTokens.setOf;
 import static com.datastax.driver.core.DataType.*;
 
 /**
@@ -1383,6 +1380,10 @@ public abstract class TypeCodec<T> {
 
         private static final TimestampCodec instance = new TimestampCodec();
 
+        private static final String PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
+        private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
+
         private TimestampCodec() {
             super(DataType.timestamp(), Date.class);
         }
@@ -1414,7 +1415,7 @@ public abstract class TypeCodec<T> {
         public String format(Date value) {
             if (value == null)
                 return "NULL";
-            return Long.toString(value.getTime());
+            return ParseUtils.quote(ParseUtils.formatDate(value, UTC, PATTERN));
         }
 
         @Override
