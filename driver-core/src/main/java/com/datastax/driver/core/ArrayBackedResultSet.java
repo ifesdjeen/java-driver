@@ -66,10 +66,16 @@ abstract class ArrayBackedResultSet implements ResultSet {
                         statement = ((StatementWrapper) statement).getWrappedStatement();
                     }
                     assert statement instanceof BoundStatement;
-                    columnDefs = ((BoundStatement) statement).statement.getPreparedId().resultSetMetadata;
+                    columnDefs = ((BoundStatement) statement).statement.getPreparedId().getResultSetMetadata();
                     assert columnDefs != null;
                 } else {
                     columnDefs = r.metadata.columns;
+                    if (statement instanceof BoundStatement && protocolVersion.toInt() >= ProtocolVersion.V5.toInt())
+                    {
+                        assert r.metadata.metadataId != null : "Metadata changed, but MetadataId is not supplied";
+                        BoundStatement bs = ((BoundStatement) statement);
+                        bs.preparedStatement().getPreparedId().swap(r.metadata.metadataId, r.metadata.columns);
+                    }
                 }
 
                 Token.Factory tokenFactory = (session == null) ? null

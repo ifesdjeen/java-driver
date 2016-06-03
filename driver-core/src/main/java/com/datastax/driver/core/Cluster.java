@@ -2198,7 +2198,13 @@ public class Cluster implements Closeable {
 
                 // The one object in the cache will get GCed once it's not referenced by the client anymore since we use a weak reference.
                 // So we need to make sure that the instance we do return to the user is the one that is in the cache.
-                return previous;
+                if (previous.getPreparedId().getResultMetadataId().equals(stmt.getPreparedId().metadata)) {
+                    return previous;
+                } else {
+                    preparedQueries.put(stmt.getPreparedId().id, stmt);
+                    return stmt;
+                }
+
             }
             return stmt;
         }
