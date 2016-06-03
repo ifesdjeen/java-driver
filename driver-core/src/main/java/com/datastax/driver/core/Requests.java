@@ -166,33 +166,40 @@ class Requests {
             @Override
             public void encode(Execute msg, ByteBuf dest, ProtocolVersion version) {
                 CBUtil.writeBytes(msg.statementId.bytes, dest);
+                if (version == ProtocolVersion.V5)
+                    CBUtil.writeBytes(msg.resultMetadataId.bytes, dest);
                 msg.options.encode(dest, version);
             }
 
             @Override
             public int encodedSize(Execute msg, ProtocolVersion version) {
-                return CBUtil.sizeOfBytes(msg.statementId.bytes)
-                        + msg.options.encodedSize(version);
+                int size = CBUtil.sizeOfBytes(msg.statementId.bytes);
+                if (version == ProtocolVersion.V5)
+                    size += CBUtil.sizeOfBytes(msg.resultMetadataId.bytes);
+                size += msg.options.encodedSize(version);
+                return size;
             }
         };
 
         final MD5Digest statementId;
+        final MD5Digest resultMetadataId;
         final QueryProtocolOptions options;
 
-        Execute(MD5Digest statementId, QueryProtocolOptions options, boolean tracingRequested) {
+        Execute(MD5Digest statementId, MD5Digest resultMetadataId, QueryProtocolOptions options, boolean tracingRequested) {
             super(Message.Request.Type.EXECUTE, tracingRequested);
             this.statementId = statementId;
+            this.resultMetadataId = resultMetadataId;
             this.options = options;
         }
 
         @Override
         Request copy() {
-            return new Execute(statementId, options, isTracingRequested());
+            return new Execute(statementId, resultMetadataId, options, isTracingRequested());
         }
 
         @Override
         Request copy(ConsistencyLevel newConsistencyLevel) {
-            return new Execute(statementId, options.copy(newConsistencyLevel), isTracingRequested());
+            return new Execute(statementId, resultMetadataId, options.copy(newConsistencyLevel), isTracingRequested());
         }
 
         @Override
@@ -304,6 +311,7 @@ class Requests {
                 case V2:
                 case V3:
                 case V4:
+                case V5:
                     CBUtil.writeConsistencyLevel(consistency, dest);
                     dest.writeByte((byte) QueryFlag.serialize(flags));
                     if (flags.contains(QueryFlag.VALUES)) {
@@ -336,6 +344,7 @@ class Requests {
                 case V2:
                 case V3:
                 case V4:
+                case V5:
                     int size = 0;
                     size += CBUtil.sizeOfConsistencyLevel(consistency);
                     size += 1; // flags
@@ -486,6 +495,7 @@ class Requests {
                     break;
                 case V3:
                 case V4:
+                case V5:
                     CBUtil.writeConsistencyLevel(consistency, dest);
                     dest.writeByte((byte) QueryFlag.serialize(flags));
                     if (flags.contains(QueryFlag.SERIAL_CONSISTENCY))
@@ -504,6 +514,7 @@ class Requests {
                     return CBUtil.sizeOfConsistencyLevel(consistency);
                 case V3:
                 case V4:
+                case V5:
                     int size = 0;
                     size += CBUtil.sizeOfConsistencyLevel(consistency);
                     size += 1; // flags

@@ -58,14 +58,14 @@ public class DefaultPreparedStatement implements PreparedStatement {
         ProtocolVersion protocolVersion = cluster.getConfiguration().getProtocolOptions().getProtocolVersion();
 
         if (defs.size() == 0) {
-            return new DefaultPreparedStatement(new PreparedId(msg.statementId, defs, msg.resultMetadata.columns, null, protocolVersion), query, queryKeyspace, msg.getCustomPayload(), cluster);
+            return new DefaultPreparedStatement(new PreparedId(msg.statementId, msg.resultMetadataId, defs, msg.resultMetadata.columns, null, protocolVersion), query, queryKeyspace, msg.getCustomPayload(), cluster);
         }
 
         int[] pkIndices = (protocolVersion.compareTo(V4) >= 0)
                 ? msg.metadata.pkIndices
                 : computePkIndices(cluster.getMetadata(), defs);
 
-        PreparedId prepId = new PreparedId(msg.statementId, defs, msg.resultMetadata.columns, pkIndices, protocolVersion);
+        PreparedId prepId = new PreparedId(msg.statementId, msg.resultMetadataId, defs, msg.resultMetadata.columns, pkIndices, protocolVersion);
 
         return new DefaultPreparedStatement(prepId, query, queryKeyspace, msg.getCustomPayload(), cluster);
     }

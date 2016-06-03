@@ -24,16 +24,33 @@ public class PreparedId {
     final MD5Digest id;
 
     final ColumnDefinitions metadata;
-    final ColumnDefinitions resultSetMetadata;
+
+    private volatile MD5Digest resultMetadataId;
+    private volatile ColumnDefinitions resultSetMetadata;
 
     final int[] routingKeyIndexes;
     final ProtocolVersion protocolVersion;
 
-    PreparedId(MD5Digest id, ColumnDefinitions metadata, ColumnDefinitions resultSetMetadata, int[] routingKeyIndexes, ProtocolVersion protocolVersion) {
+    PreparedId(MD5Digest id, MD5Digest resultMetadataId, ColumnDefinitions metadata, ColumnDefinitions resultSetMetadata, int[] routingKeyIndexes, ProtocolVersion protocolVersion) {
         this.id = id;
+        this.resultMetadataId = resultMetadataId;
         this.metadata = metadata;
         this.resultSetMetadata = resultSetMetadata;
         this.routingKeyIndexes = routingKeyIndexes;
         this.protocolVersion = protocolVersion;
+    }
+
+    public void swap(MD5Digest metadataId, ColumnDefinitions resultSetMetadata)
+    {
+        this.resultMetadataId = metadataId;
+        this.resultSetMetadata = resultSetMetadata;
+    }
+
+    public MD5Digest getResultMetadataId() {
+        return resultMetadataId;
+    }
+
+    public ColumnDefinitions getResultSetMetadata() {
+        return resultSetMetadata;
     }
 }

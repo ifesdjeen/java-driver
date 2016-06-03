@@ -570,10 +570,10 @@ class SessionManager extends AbstractSession {
             }
             if (protocolVersion.compareTo(ProtocolVersion.V4) < 0)
                 bs.ensureAllSet();
-            boolean skipMetadata = protocolVersion != ProtocolVersion.V1 && bs.statement.getPreparedId().resultSetMetadata != null;
+            boolean skipMetadata = protocolVersion != ProtocolVersion.V1 && bs.statement.getPreparedId().getResultMetadataId() != null;
             Requests.QueryProtocolOptions options = new Requests.QueryProtocolOptions(consistency, Arrays.asList(bs.wrapper.values), Collections.<String, ByteBuffer>emptyMap(), skipMetadata,
                     fetchSize, usedPagingState, serialConsistency, defaultTimestamp);
-            request = new Requests.Execute(bs.statement.getPreparedId().id, options, statement.isTracing());
+            request = new Requests.Execute(bs.statement.getPreparedId().id, bs.statement.getPreparedId().getResultMetadataId(), options, statement.isTracing());
         } else {
             assert statement instanceof BatchStatement : statement;
             assert pagingState == null;
