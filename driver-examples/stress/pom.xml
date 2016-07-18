@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.datastax.cassandra</groupId>
         <artifactId>cassandra-driver-examples-parent</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.1-PATCHED</version>
     </parent>
     <artifactId>cassandra-driver-examples-stress</artifactId>
     <packaging>jar</packaging>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.datastax.cassandra</groupId>
             <artifactId>cassandra-driver-core</artifactId>
-            <version>3.0.1-SNAPSHOT</version>
+            <version>3.0.1-PATCHED</version>
         </dependency>
 
         <dependency>
@@ -106,4 +106,3 @@
         </developer>
     </developers>
 </project>
-

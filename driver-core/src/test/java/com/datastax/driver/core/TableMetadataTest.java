@@ -17,7 +17,7 @@ package com.datastax.driver.core;
 
 import com.datastax.driver.core.utils.CassandraVersion;
 import com.google.common.collect.ImmutableMap;
-import org.testng.annotations.Test;
+ import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;
 
