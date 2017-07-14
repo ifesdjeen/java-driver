@@ -41,9 +41,7 @@ public class PreparedId {
         this.protocolVersion = protocolVersion;
     }
 
-
     static class PreparedMetadata {
-
         final MD5Digest id;
         final ColumnDefinitions variables;
 

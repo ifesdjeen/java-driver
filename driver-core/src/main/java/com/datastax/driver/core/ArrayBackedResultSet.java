@@ -67,10 +67,6 @@ abstract class ArrayBackedResultSet implements ResultSet {
                     // not a RegularStatement (QUERY request), because the driver
                     // only ever sets the flag SKIP_METADATA to true for bound statements,
                     // never for regular ones.
-                    Statement actualStatement = statement;
-                    if (statement instanceof StatementWrapper) {
-                        actualStatement = ((StatementWrapper) statement).getWrappedStatement();
-                    }
                     assert statement instanceof BoundStatement;
                     columnDefs = ((BoundStatement) statement).statement.getPreparedId().resultSetMetadata.variables;
                     assert columnDefs != null;
@@ -81,11 +77,9 @@ abstract class ArrayBackedResultSet implements ResultSet {
                     columnDefs = r.metadata.columns;
                     if (statement instanceof BoundStatement) {
                         // r.metadata.metadataId is necessarily present
-                        // if the flag METADATA_CHANGED was set,
-                        // see Responses.Result.Rows.Metadata.decode(),
-                        // unless we are using v1, in which case every ROWS response
-                        // contains full metadata information.
-                        assert protocolVersion == ProtocolVersion.V1 || r.metadata.metadataId != null;
+                        // if the flag METADATA_CHANGED was set starting
+                        // with v5 messaging version.
+                        assert protocolVersion.compareTo(ProtocolVersion.V5) >= 0 || r.metadata.metadataId == null;
                         BoundStatement bs = ((BoundStatement) statement);
                         // the resultset metadata changed, update the prepared statement accordingly.
                         bs.preparedStatement().getPreparedId().resultSetMetadata = new PreparedId.PreparedMetadata(r.metadata.metadataId, r.metadata.columns);
