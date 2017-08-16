@@ -60,6 +60,11 @@ abstract class ArrayBackedResultSet implements ResultSet {
             case ROWS:
                 Responses.Result.Rows r = (Responses.Result.Rows) msg;
 
+                Statement actualStatement = statement;
+                if (statement instanceof StatementWrapper) {
+                    actualStatement = ((StatementWrapper) statement).getWrappedStatement();
+                }
+
                 ColumnDefinitions columnDefs;
                 if (r.metadata.columns == null) {
                     // if resultset metadata is not present, this means that
@@ -67,15 +72,15 @@ abstract class ArrayBackedResultSet implements ResultSet {
                     // not a RegularStatement (QUERY request), because the driver
                     // only ever sets the flag SKIP_METADATA to true for bound statements,
                     // never for regular ones.
-                    assert statement instanceof BoundStatement;
-                    columnDefs = ((BoundStatement) statement).statement.getPreparedId().resultSetMetadata.variables;
+                    assert actualStatement instanceof BoundStatement;
+                    columnDefs = ((BoundStatement) actualStatement).statement.getPreparedId().resultSetMetadata.variables;
                     assert columnDefs != null;
                 } else {
                     // metadata is always present for regular statements (QUERY requests);
                     // it might also be present for bound statements (EXECUTE requests)
                     // if the metadata has changed server-side.
                     columnDefs = r.metadata.columns;
-                    if (statement instanceof BoundStatement) {
+                    if (actualStatement instanceof BoundStatement) {
                         // r.metadata.metadataId is necessarily present
                         // if the flag METADATA_CHANGED was set starting
                         // with v5 messaging version.
